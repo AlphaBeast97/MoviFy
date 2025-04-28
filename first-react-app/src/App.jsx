@@ -1,60 +1,94 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
+import Search from './components/Search.jsx'
+import Spinner from './components/Spinner.jsx'
+import MovieCard from './components/MovieCard.jsx'
+import { useDebounce } from 'react-use'
 
-// automatically imported built in feature
-// any thing that starts with use is a hook
-// hook are special function that let you use react features like state management
 
-// new and recommended way
 
-// state is like a react components brain
-// they are reset after reload
-// these are components that can change our time
-const Card = ({ title }) => {
-  // const [varName, setVar] = hook();
-  // setVar is function that changes the varName.
-  const [hasLiked, setHasLiked] = useState(false);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    console.log(`${title} Is Liked? ${hasLiked}`);
-  }, [hasLiked]);// in "[]" we pass the value on change of which the useEffect will take place
-
-  // common Use case 
-  // it runs only one when mounting this component
-  // for now it will run each time the card func is called
-  // useEffect(() => {
-  //   console.log("CARD RENDERED");
-  // },[])
-  
-  return (
-    // inline styling in form of like in Java script
-    <div className="card" onClick={() => setCount((prevState) => ++prevState)}>
-      <h2>{title} <br/> {count || null}</h2> {/* example of conditional rendering */}
-      <button onClick={() => setHasLiked((prevState) => !prevState)}>{hasLiked? '❤️':'🤍'}</button>
-    </div>
-  )
+const API_BASE_URL = 'https://api.themoviedb.org/3'
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const API_OPTIONS = {
+  method: 'GET',
+  headers: {
+    accept: 'application/json',
+    Authorization: `Bearer ${API_KEY}`
+  }
 }
 
-// useEffect hook
-// it lets you fetch data or delete component
+function App() {
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [errorMsg, setErrorMsg] = useState('');
+  const [movieList, setMovieList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [debounceSearchterm, setDebounceSearchTerm] = useState('');
 
+  // debounces the search term to prevent making too many API requests
+  // by waiting for the user for stop typing for 500ms
+  useDebounce(() => setDebounceSearchTerm(searchTerm), 500, [searchTerm]);
 
-// "<>" are called react fragments we can just use a normal div in place as well.
-// i am already hating the debugging :(
-  const App = () => {
-    return (
-    <div className="card-container"> 
-      <Card title="Annabelle" rating={5.5} isCool={true} />
-      <Card title="Star Wars: Episode IV - A New Hope" />
-      <Card title="The Lion King" />
-      {/* passing properties "title" is called "props" */}
-      {/* the below thing is just like calling a function "Card" and passing a var "title" to it noice. */}
-      {/* to pass something as a bool write it in {} */}
-      {/* we can also pass objects like this (idk why i am surprised its a literal func call :) */}
-    </div>
+  const fetchMovies = async (query = '') => {
+    setIsLoading(true);
+    setErrorMsg('');
+    
+    try {
+      const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const response = await fetch(endpoint, API_OPTIONS);
+      if(!response.ok){
+        throw new Error('Failed to fetch movies')
+      }
+
+      const data = await response.json();
+      if(data.Response === 'False'){
+        setErrorMsg(data.Error || 'Failed to fetch movies');
+        setMovieList([]);
+        return;
+      }
+      setMovieList(data.results || []);
+
+    } catch (error) {
+      console.log(`Error fetching Movies ${error}`);
+      setErrorMsg('Error fetching movies. Please try again later')
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  
+  useEffect(() => {
+    fetchMovies(debounceSearchterm);
+  }, [debounceSearchterm]);
+
+  return (
+    <main>
+      <div className="pattern">
+        <div className="wrapper">
+          <header>
+            <img src="./hero-img.png" alt="Hero Background" />
+            <h1>Find <span className="text-gradient">Movies</span> You'll Love Without the Hassle</h1>
+
+            <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </header>
+
+          <section className='all-movies'>
+            <h2 className='mt-[40px]'>All movies</h2>
+            
+            {isLoading ? (
+              <Spinner/>
+            ) : errorMsg ? (
+              <p className='text-red-500'>{errorMsg}</p>
+            ) : (
+              <ul>
+                {movieList.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie}/>
+                  // <p key={movie.id} className='text-white'>{movie.title}</p>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
+    </main>
   )
 }
 
 export default App
-
-
