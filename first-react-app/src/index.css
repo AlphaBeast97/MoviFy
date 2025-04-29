@@ -3,25 +3,27 @@
 
 @import "tailwindcss";
 
+
 @theme {
   --color-primary: #030014;
-
+  
   --color-light-100: #cecefb;
   --color-light-200: #a8b5db;
-
+  
   --color-gray-100: #9ca4ab;
-
+  
   --color-dark-100: #0f0d23;
-
+  
   --font-dm-sans: DM Sans, sans-serif;
-
+  
   --breakpoint-xs: 480px;
-
+  
   --background-image-hero-pattern: url("/BG.png");
 }
 
 @layer base {
   body {
+    overflow-x: hidden;
     font-family: "DM Sans", serif;
     font-optical-sizing: auto;
     background: #030014;
@@ -54,7 +56,7 @@
   }
 
   .wrapper {
-    @apply px-5 py-12 xs:p-10 max-w-7xl mx-auto flex flex-col relative z-10;
+    @apply px-5 py-12 xs:p-10 max-w-450 mx-auto flex flex-col relative z-10 transform lg:translate-y-[-100px];
   }
 
   .trending {

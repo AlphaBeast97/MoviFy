@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
+import { useDebounce } from 'react-use'
+
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
 import MovieCard from './components/MovieCard.jsx'
-import { useDebounce } from 'react-use'
-
+import { updateSearchCount } from './appwrite.js'
 
 
 const API_BASE_URL = 'https://api.themoviedb.org/3'
@@ -34,17 +35,24 @@ function App() {
     try {
       const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
+
       if(!response.ok){
-        throw new Error('Failed to fetch movies')
+        const errorData = await response.json();
+        throw new Error(errorData.status_message || 'Failed to fetch movies');
       }
 
       const data = await response.json();
-      if(data.Response === 'False'){
-        setErrorMsg(data.Error || 'Failed to fetch movies');
+      if(data.results && data.results.length === 0){
+        setErrorMsg('No movies found for your search.');
         setMovieList([]);
         return;
       }
+      
       setMovieList(data.results || []);
+      if(query && data.results.length > 0){
+        await updateSearchCount(query, data.results[0]);
+
+      }
 
     } catch (error) {
       console.log(`Error fetching Movies ${error}`);
@@ -63,14 +71,16 @@ function App() {
       <div className="pattern">
         <div className="wrapper">
           <header>
-            <img src="./hero-img.png" alt="Hero Background" />
+            <img className='max-w-150' src="./hero-img.png" alt="Hero Background" />
             <h1>Find <span className="text-gradient">Movies</span> You'll Love Without the Hassle</h1>
 
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </header>
 
           <section className='all-movies'>
-            <h2 className='mt-[40px]'>All movies</h2>
+            <h2 className='mt-12 lg:text-4xl font-extrabold tracking-wide text-indigo-600 dark:text-indigo-400 sm:text-4xl'>
+              All <span className="text-gray-900 dark:text-gray-100">Movies</span>
+            </h2>
             
             {isLoading ? (
               <Spinner/>
@@ -80,7 +90,6 @@ function App() {
               <ul>
                 {movieList.map((movie) => (
                   <MovieCard key={movie.id} movie={movie}/>
-                  // <p key={movie.id} className='text-white'>{movie.title}</p>
                 ))}
               </ul>
             )}
