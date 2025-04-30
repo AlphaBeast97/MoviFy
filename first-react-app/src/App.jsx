@@ -4,6 +4,7 @@ import { useDebounce } from 'react-use'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
 import MovieCard from './components/MovieCard.jsx'
+import Footer from './components/Footer.jsx'
 import { getTrendingMovies, updateSearchCount } from './appwrite.js'
 
 
@@ -123,7 +124,11 @@ function App() {
               </ul>
             )}
           </section>
+          <div className="btn text-white text-center ml-3 mr-3 mt-10">
+            <button className='bg-blue-700 cursor-pointer rounded-md transition-all hover:opacity-80 p-1.5 w-50 active:scale-92'> Load More </button>
+          </div>
         </div>
+        <Footer/>
       </div>
     </main>
   )
