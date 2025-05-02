@@ -32,8 +32,8 @@ const MovieCard = ({ movie:
     {title, vote_average, poster_path, release_date, original_language, genre_ids} 
 }) => {
   return (
-    <div className='movie-card'>
-        <img src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : './No-Poster.png'} alt={title} />
+    <div className='cursor-pointer movie-card group'>
+        <img className='rounded-lg duration-250 transition-all group-hover:scale-105 group-hover:shadow-blue-800 shadow-2xl group-hover:border-1 group-hover:border-blue-200 active:scale-100 active:shadow-md ' src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : './No-Poster.png'} alt={title} />
         <div className='mt-4'>
             <h3>{title}</h3>
 

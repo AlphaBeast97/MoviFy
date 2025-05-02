@@ -24,6 +24,9 @@ function App() {
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [movieList, setMovieList] = useState([]);
   
+  const [isgray, setIsGray] = useState(true);
+  const [pageNum, setPageNum] = useState(1);
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -31,12 +34,12 @@ function App() {
   // by waiting for the user for stop typing for 500ms
   useDebounce(() => setDebounceSearchTerm(searchTerm), 500, [searchTerm]);
 
-  const fetchMovies = async (query = '') => {
+  const fetchMovies = async (query = '', pageNum) => {
     setIsLoading(true);
     setErrorMsg('');
     
     try {
-      const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNum}`;
       const response = await fetch(endpoint, API_OPTIONS);
 
       if(!response.ok){
@@ -73,12 +76,14 @@ function App() {
   }
 
   useEffect(() => {
-    fetchMovies(debounceSearchterm);
-  }, [debounceSearchterm]);
+    fetchMovies(debounceSearchterm, pageNum);
+    pageNum === 1 ? setIsGray(true) : setIsGray(false);
+  }, [debounceSearchterm, pageNum]);
 
   useEffect(() => {
     loadTrendingMovies();
   }, []);
+
 
   return (
     <main>
@@ -124,8 +129,10 @@ function App() {
               </ul>
             )}
           </section>
-          <div className="btn text-white text-center ml-3 mr-3 mt-10">
-            <button className='bg-blue-700 cursor-pointer rounded-md transition-all hover:opacity-80 p-1.5 w-50 active:scale-92'> Load More </button>
+          <div className='text-white flex justify-between ml-3 mr-3 mt-10'>
+            <button onClick={() => (pageNum === 1 ? null : setPageNum(pageNum - 1))} id='prev' className={`bg-blue-700 cursor-pointer rounded-xl transition-all hover:opacity-80 p-1.5 h-15 w-15 active:scale-92 active:opacity-80  ${isgray ? 'grayscale line-through' : ''}`} > &lt; </button>
+            <p className='pt-5 text-violet-300 animate-pulse'>Page: {pageNum}</p>
+            <button onClick={() => (setPageNum(pageNum + 1))} id='next' className='bg-blue-700 cursor-pointer rounded-xl transition-all hover:opacity-80 p-1.5 h-15 w-15 active:scale-92 active:opacity-80'> &gt; </button>
           </div>
         </div>
         <Footer/>
