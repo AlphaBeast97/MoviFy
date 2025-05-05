@@ -48,7 +48,7 @@ const MovieCard = ({ movie:
                 <span>•</span>
                 <p className="year">{release_date ? release_date.split('-')[0] : 'N/A'}</p>
                 <span>•</span>
-                <p className="year">{GenreLookupTable(genre_ids[0])}</p>
+                <p className="year">{GenreLookupTable(genre_ids && [0])}</p>
             </div>
         </div>
     </div>
