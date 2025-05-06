@@ -38,7 +38,7 @@
   }
 
   main {
-    @apply min-h-screen relative bg-primary;
+    /* @apply min-h-screen relative bg-primary; */
   }
 
   header {

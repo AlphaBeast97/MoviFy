@@ -28,29 +28,32 @@ function GenreLookupTable(genre_ids) {
     return genre
 }
 
-const MovieCard = ({ movie: 
-    {title, vote_average, poster_path, release_date, original_language, genre_ids} 
-}) => {
+const MovieCard = ({ setSelectedMovie, setIsCardSelected, movie }) => {
 
-    const firstGenreId = genre_ids && genre_ids.length > 0 ? genre_ids[0] : null;
+    const selectedMovie = (movie) => {
+        setIsCardSelected((prev) => !prev)
+        setSelectedMovie(movie)
+    }
+
+    const firstGenreId = movie.genre_ids && movie.genre_ids.length > 0 ? movie.genre_ids[0] : null;
     const genreName = GenreLookupTable(firstGenreId);
 
   return (
-    <div className='cursor-pointer movie-card group'>
-        <img className='rounded-lg duration-250 transition-all group-hover:scale-105 group-hover:shadow-blue-800 shadow-2xl group-hover:border-1 group-hover:border-blue-200 active:scale-100 active:shadow-md ' src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : './No-Poster.png'} alt={title} />
+    <div onClick={() => selectedMovie(movie)} className='cursor-pointer movie-card group'>
+        <img className='rounded-lg duration-250 transition-all group-hover:scale-105 group-hover:shadow-blue-800 shadow-2xl group-hover:border-1 group-hover:border-blue-200 active:scale-100 active:shadow-md ' src={movie.poster_path ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}` : './No-Poster.png'} alt={movie.title} />
         <div className='mt-4'>
-            <h3>{title}</h3>
+            <h3>{movie.title}</h3>
 
             <div className='content'>
                 <div className="rating">
                     <img src="./Rating.svg" alt="Star-icon" />
-                    <p>{vote_average ? vote_average.toFixed(1) : 'N/A'}</p>
+                    <p>{movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}</p>
                 </div>
 
                 <span>•</span>
-                <p className="lang">{original_language}</p>
+                <p className="lang">{movie.original_language}</p>
                 <span>•</span>
-                <p className="year">{release_date ? release_date.split('-')[0] : 'N/A'}</p>
+                <p className="year">{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
                 <span>•</span>
                 <p className="year">{genreName}</p>
             </div>
