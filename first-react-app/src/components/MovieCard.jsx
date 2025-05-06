@@ -24,13 +24,17 @@ function GenreLookupTable(genre_ids) {
         37: 'Western',
     };
     
-    const genre = genreDataById[genre_ids] || 'N/A'
+    const genre = genreDataById[genre_ids] ? genreDataById[genre_ids] : 'N/A'
     return genre
 }
 
 const MovieCard = ({ movie: 
     {title, vote_average, poster_path, release_date, original_language, genre_ids} 
 }) => {
+
+    const firstGenreId = genre_ids && genre_ids.length > 0 ? genre_ids[0] : null;
+    const genreName = GenreLookupTable(firstGenreId);
+
   return (
     <div className='cursor-pointer movie-card group'>
         <img className='rounded-lg duration-250 transition-all group-hover:scale-105 group-hover:shadow-blue-800 shadow-2xl group-hover:border-1 group-hover:border-blue-200 active:scale-100 active:shadow-md ' src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : './No-Poster.png'} alt={title} />
@@ -48,7 +52,7 @@ const MovieCard = ({ movie:
                 <span>•</span>
                 <p className="year">{release_date ? release_date.split('-')[0] : 'N/A'}</p>
                 <span>•</span>
-                <p className="year">{GenreLookupTable(genre_ids && [0])}</p>
+                <p className="year">{genreName}</p>
             </div>
         </div>
     </div>
