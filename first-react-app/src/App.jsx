@@ -29,6 +29,8 @@ function App() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isLoadingTrending, setIsLoadingTrending] = useState(false);
+  const [errorMsgTrending, setErrorMsgTrending] = useState('');
 
   // debounces the search term to prevent making too many API requests
   // by waiting for the user for stop typing for 500ms
@@ -38,6 +40,8 @@ function App() {
     setIsLoading(true);
     setErrorMsg('');
     
+    query || setPageNum(1)
+
     try {
       const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNum}`;
       const response = await fetch(endpoint, API_OPTIONS);
@@ -67,11 +71,15 @@ function App() {
   }
   
   const loadTrendingMovies = async () => {
+    setIsLoadingTrending(true)
     try {
       const movies = await getTrendingMovies();
       setTrendingMovies(movies);
     } catch (error) {
+      setErrorMsgTrending(`Error fetching movies. ${error}`)
       console.error(`Error fetching movies. ${error}`)
+    } finally {
+      setIsLoadingTrending(false)
     }
   }
 
@@ -96,21 +104,27 @@ function App() {
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </header>
 
-          {trendingMovies.length > 0 && (
-            <section className='trending'>
-              <h2 className=' lg:text-4xl font-extrabold tracking-wide text-indigo-600 dark:text-indigo-400 sm:text-4xl'>
-              Trending <span className="text-gray-900 dark:text-gray-100">Movies</span>
-              </h2>
-              <ul>
-                {trendingMovies.map((movie, index) => (
-                  <li key={movie.$id}>
-                    <p>{index + 1}</p>
-                    <img src={movie.poster_url} alt={movie.title} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <h2 className=' lg:text-4xl font-extrabold tracking-wide text-indigo-600 dark:text-indigo-400 sm:text-4xl'>
+          Trending <span className="text-gray-900 dark:text-gray-100">Movies</span>
+          </h2>
+          {isLoadingTrending ? <Spinner /> : 
+            trendingMovies.length > 0 ? (
+              <section className='trending'>
+                <ul>
+                  {trendingMovies.map((movie, index) => (
+                    <li key={movie.$id}>
+                      <p>{index + 1}</p>
+                      <img src={movie.poster_url} alt={movie.title} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : errorMsgTrending ? (
+              <p className='text-red-500'>{errorMsgTrending}</p>
+            ) : (
+              <p className='text-red-500'>No trending movies were found</p>
+            )
+          }
 
           <section className='all-movies'>
             <h2 className=' lg:text-4xl font-extrabold tracking-wide text-indigo-600 dark:text-indigo-400 sm:text-4xl'>
