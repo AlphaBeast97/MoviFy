@@ -140,9 +140,9 @@ function App() {
             <Spinner />
           ) : trendingMovies.length > 0 ? (
             <section className="trending">
-              <ul>
+              <ul className="overflow-y-hidden">
                 {trendingMovies.map((movie, index) => (
-                  <li key={movie.$id}>
+                  <li className="transition-all hover:scale-110 cursor-pointer active:scale-100" key={movie.$id}>
                     <p>{index + 1}</p>
                     <img src={movie.poster_url} alt={movie.title} />
                   </li>
