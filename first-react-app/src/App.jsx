@@ -20,6 +20,8 @@ const API_OPTIONS = {
 };
 
 function App() {
+  const [toHomePage, setToHomePage] = useState(false)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [debounceSearchterm, setDebounceSearchTerm] = useState("");
   
@@ -117,8 +119,8 @@ function App() {
 
   return (
     <main>
-      {isCardSelected ? (
-        <InfoPage movie={selectedMovie} />) : 
+      {isCardSelected && !toHomePage ? (
+        <InfoPage setToHomePage={setToHomePage} API_BASE_URL={API_BASE_URL} API_KEY={API_KEY} API_OPTIONS={API_OPTIONS} movie={selectedMovie} />) : 
         (
           <div className="pattern">
           <div className="wrapper">
@@ -173,9 +175,9 @@ function App() {
               ) : errorMsg ? (
                 <p className="text-red-500">{errorMsg}</p>
               ) : (
-                <ul>
+                <ul >
                   {movieList.map((movie) => (
-                    <MovieCard setSelectedMovie={setSelectedMovie} setIsCardSelected={setIsCardSelected} key={movie.id} movie={movie} />
+                    <MovieCard setToHomePage={setToHomePage} setSelectedMovie={setSelectedMovie} setIsCardSelected={setIsCardSelected} key={movie.id} movie={movie} />
                   ))}
                 </ul>
               )}

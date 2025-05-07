@@ -1,7 +1,7 @@
 import React from 'react'
 
 // yes i did something
-function GenreLookupTable(genre_ids) {
+export function GenreLookupTable(genre_ids) {
     const genreDataById = {
         28: 'Action',
         12: 'Adventure',
@@ -28,10 +28,11 @@ function GenreLookupTable(genre_ids) {
     return genre
 }
 
-const MovieCard = ({ setSelectedMovie, setIsCardSelected, movie }) => {
+const MovieCard = ({ setToHomePage ,setSelectedMovie, setIsCardSelected, movie }) => {
 
     const selectedMovie = (movie) => {
-        setIsCardSelected((prev) => !prev)
+        setToHomePage(false)
+        setIsCardSelected(true)
         setSelectedMovie(movie)
     }
 
