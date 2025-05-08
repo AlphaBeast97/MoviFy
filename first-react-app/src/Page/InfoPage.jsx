@@ -62,7 +62,11 @@ const InfoPage = ({
   }, [API_BASE_URL, API_KEY, API_OPTIONS, movie]);
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <div className="min-h-dvh min-w-dvw flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (error) {
